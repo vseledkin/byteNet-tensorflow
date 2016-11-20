@@ -1,3 +1,6 @@
+#!/usr/local/bin/python3
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import tensorflow as tf
 import numpy as np
 import argparse
@@ -20,13 +23,13 @@ def main():
                        help='Pre-Trained Model Path, to resume from')
 	parser.add_argument('--data_dir', type=str, default='Data',
                        help='Data Directory')
-	
+
 
 
 	args = parser.parse_args()
-	
+
 	# model_config = json.loads( open('model_config.json').read() )
-	
+
 	config = model_config.predictor_config
 
 	model_options = {
@@ -43,7 +46,7 @@ def main():
 	bn_tensors = byte_net.build_prediction_model()
 
 	optim = tf.train.AdamOptimizer(
-		args.learning_rate, 
+		args.learning_rate,
 		beta1 = args.beta1).minimize(bn_tensors['loss'], var_list=bn_tensors['variables'])
 
 	sess = tf.InteractiveSession()
@@ -55,7 +58,7 @@ def main():
 
 	dl = data_loader.Data_Loader({'model_type' : 'generator', 'dir_name' : args.data_dir})
 	text_samples = dl.load_generator_data( config['sample_size'])
-	print text_samples.shape
+	print(text_samples.shape)
 
 	for i in range(args.max_epochs):
 		batch_no = 0
@@ -65,13 +68,13 @@ def main():
 			_, loss, prediction = sess.run( [optim, bn_tensors['loss'], bn_tensors['prediction']], feed_dict = {
 				bn_tensors['sentence'] : text_batch
 				})
-			print "-------------------------------------------------------"
-			print utils.list_to_string(prediction)
-			print "Loss", i, batch_no, loss
-			print "********************************************************"
+			print("-------------------------------------------------------")
+			print(utils.list_to_string(prediction))
+			print("Loss", i, batch_no, loss)
+			print("********************************************************")
 			# print prediction
 			batch_no += 1
-			
+
 			if (batch_no % 500) == 0:
 				save_path = saver.save(sess, "Data/Models/model_epoch_{}.ckpt".format(i))
 
